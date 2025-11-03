@@ -11,6 +11,7 @@ public class Main {
         System.out.println("Iniciando pruebas del sistema...\n"); 
  
         probarCifradorHibrido(); 
+        probarArchivos(); 
     } 
  
     private static void probarCifradorHibrido() { 
@@ -47,6 +48,41 @@ public class Main {
         } catch (Exception e) { 
             System.err.println("Error en la prueba: " + e.getMessage()); 
             e.printStackTrace(); 
+        } 
+    } 
+ 
+    private static void probarArchivos() { 
+        try { 
+            System.out.println("\n=== PRUEBA CON ARCHIVOS ==="); 
+ 
+            CifradorHibrido cifrador = new CifradorHibrido(); 
+            cifrador.getRsaManager().generarParClaves(); 
+ 
+            // Crear archivo de prueba 
+            String textoPrueba = "Este es el contenido de mi archivo de prueba para el proyecto!"; 
+            FileManager.escribirArchivo("prueba.txt", textoPrueba.getBytes()); 
+ 
+            // Cifrar archivo 
+            boolean exitoCifrado = cifrador.cifrarArchivo( 
+                "prueba.txt", 
+                "prueba_cifrado.enc", 
+                cifrador.getRsaManager().getClavePublica() 
+            ); 
+ 
+            if (exitoCifrado) { 
+                // Descifrar archivo 
+                boolean exitoDescifrado = cifrador.descifrarArchivo( 
+                    "prueba_cifrado.enc", 
+                    "prueba_descifrado.txt" 
+                ); 
+ 
+                if (exitoDescifrado) { 
+                    System.out.println("Prueba de archivos EXITOSA"); 
+                } 
+            } 
+ 
+        } catch (Exception e) { 
+            System.err.println("Error en prueba de archivos: " + e.getMessage()); 
         } 
     } 
 } 

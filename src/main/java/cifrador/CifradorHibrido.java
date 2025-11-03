@@ -1,11 +1,8 @@
 package cifrador; 
  
 import java.security.PublicKey; 
+import java.util.Base64; 
  
-/** 
- * Coordina el cifrado hibrido RSA + AES 
- * Responsable: Angel de Jesus Fiscal Malaga 
- */ 
 public class CifradorHibrido { 
     private RSAManager rsaManager; 
     private AESManager aesManager; 
@@ -22,7 +19,7 @@ public class CifradorHibrido {
             aesManager.generarClave(); 
             String claveAES = aesManager.claveAESToString(); 
  
-            String datosCifrados = aesManager.cifrar(datos); 
+            String datosCifrados = aesManager.cifrarTexto(datos); 
  
             String claveAESCifrada = rsaManager.cifrar(claveAES, clavePublica); 
  
@@ -43,7 +40,7 @@ public class CifradorHibrido {
  
             aesManager.claveAESFromString(claveAES); 
  
-            String datosOriginales = aesManager.descifrar(resultado.getDatosCifrados()); 
+            String datosOriginales = aesManager.descifrarTexto(resultado.getDatosCifrados()); 
  
             System.out.println("Descifrado hibrido completado"); 
             return datosOriginales; 
@@ -51,6 +48,71 @@ public class CifradorHibrido {
         } catch (Exception e) { 
             System.err.println("Error en descifrado hibrido: " + e.getMessage()); 
             return null; 
+        } 
+    } 
+ 
+    public boolean cifrarArchivo(String rutaArchivo, String rutaSalida, PublicKey clavePublica) { 
+        try { 
+            System.out.println("Cifrando archivo: " + rutaArchivo); 
+ 
+            byte[] datosArchivo = FileManager.leerArchivo(rutaArchivo); 
+            if (datosArchivo == null) return false; 
+ 
+            aesManager.generarClave(); 
+            byte[] archivoCifrado = aesManager.cifrarArchivo(datosArchivo); 
+ 
+            String claveAES = aesManager.claveAESToString(); 
+            String claveAESCifrada = rsaManager.cifrar(claveAES, clavePublica); 
+ 
+            String contenidoFinal = claveAESCifrada + "\n" + Base64.getEncoder().encodeToString(archivoCifrado); 
+            boolean exito = FileManager.escribirArchivo(rutaSalida, contenidoFinal.getBytes()); 
+ 
+            if (exito) { 
+                System.out.println("Archivo cifrado guardado: " + rutaSalida); 
+            } 
+ 
+            return exito; 
+ 
+        } catch (Exception e) { 
+            System.err.println("Error cifrando archivo: " + e.getMessage()); 
+            return false; 
+        } 
+    } 
+ 
+    public boolean descifrarArchivo(String rutaArchivoCifrado, String rutaSalida) { 
+        try { 
+            System.out.println("Descifrando archivo: " + rutaArchivoCifrado); 
+ 
+            byte[] datos = FileManager.leerArchivo(rutaArchivoCifrado); 
+            if (datos == null) return false; 
+ 
+            String contenido = new String(datos); 
+            String[] partes = contenido.split("\n", 2); 
+ 
+            if (partes.length != 2) { 
+                System.err.println("Formato de archivo cifrado invalido"); 
+                return false; 
+            } 
+ 
+            String claveAESCifrada = partes[0]; 
+            byte[] archivoCifrado = Base64.getDecoder().decode(partes[1]); 
+ 
+            String claveAES = rsaManager.descifrar(claveAESCifrada, rsaManager.getClavePrivada()); 
+            aesManager.claveAESFromString(claveAES); 
+ 
+            byte[] archivoOriginal = aesManager.descifrarArchivo(archivoCifrado); 
+ 
+            boolean exito = FileManager.escribirArchivo(rutaSalida, archivoOriginal); 
+ 
+            if (exito) { 
+                System.out.println("Archivo descifrado guardado: " + rutaSalida); 
+            } 
+ 
+            return exito; 
+ 
+        } catch (Exception e) { 
+            System.err.println("Error descifrando archivo: " + e.getMessage()); 
+            return false; 
         } 
     } 
  
