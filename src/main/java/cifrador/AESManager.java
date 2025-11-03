@@ -34,7 +34,8 @@ public class AESManager {
         } 
     } 
  
-    public String cifrar(String datos) { 
+    // Para texto 
+    public String cifrarTexto(String texto) { 
         try { 
             byte[] iv = new byte[TAMANIO_IV]; 
             SecureRandom random = new SecureRandom(); 
@@ -44,7 +45,7 @@ public class AESManager {
             GCMParameterSpec spec = new GCMParameterSpec(TAMANIO_TAG, iv); 
             cipher.init(Cipher.ENCRYPT_MODE, claveAES, spec); 
  
-            byte[] datosCifrados = cipher.doFinal(datos.getBytes()); 
+            byte[] datosCifrados = cipher.doFinal(texto.getBytes()); 
  
             byte[] resultado = new byte[iv.length + datosCifrados.length]; 
             System.arraycopy(iv, 0, resultado, 0, iv.length); 
@@ -52,14 +53,39 @@ public class AESManager {
  
             return Base64.getEncoder().encodeToString(resultado); 
         } catch (Exception e) { 
-            System.err.println("Error al cifrar con AES: " + e.getMessage()); 
+            System.err.println("Error al cifrar texto con AES: " + e.getMessage()); 
             return null; 
         } 
     } 
  
-    public String descifrar(String datosCifrados) { 
+    // Para archivos (bytes) 
+    public byte[] cifrarArchivo(byte[] datosArchivo) { 
         try { 
-            byte[] datosCombinados = Base64.getDecoder().decode(datosCifrados); 
+            byte[] iv = new byte[TAMANIO_IV]; 
+            SecureRandom random = new SecureRandom(); 
+            random.nextBytes(iv); 
+ 
+            Cipher cipher = Cipher.getInstance(TRANSFORMACION); 
+            GCMParameterSpec spec = new GCMParameterSpec(TAMANIO_TAG, iv); 
+            cipher.init(Cipher.ENCRYPT_MODE, claveAES, spec); 
+ 
+            byte[] datosCifrados = cipher.doFinal(datosArchivo); 
+ 
+            byte[] resultado = new byte[iv.length + datosCifrados.length]; 
+            System.arraycopy(iv, 0, resultado, 0, iv.length); 
+            System.arraycopy(datosCifrados, 0, resultado, iv.length, datosCifrados.length); 
+ 
+            return resultado; 
+        } catch (Exception e) { 
+            System.err.println("Error al cifrar archivo con AES: " + e.getMessage()); 
+            return null; 
+        } 
+    } 
+ 
+    // Para texto 
+    public String descifrarTexto(String textoCifrado) { 
+        try { 
+            byte[] datosCombinados = Base64.getDecoder().decode(textoCifrado); 
  
             byte[] iv = new byte[TAMANIO_IV]; 
             System.arraycopy(datosCombinados, 0, iv, 0, iv.length); 
@@ -74,7 +100,27 @@ public class AESManager {
             byte[] datosOriginales = cipher.doFinal(datosCifradosBytes); 
             return new String(datosOriginales); 
         } catch (Exception e) { 
-            System.err.println("Error al descifrar con AES: " + e.getMessage()); 
+            System.err.println("Error al descifrar texto con AES: " + e.getMessage()); 
+            return null; 
+        } 
+    } 
+ 
+    // Para archivos (bytes) 
+    public byte[] descifrarArchivo(byte[] archivoCifrado) { 
+        try { 
+            byte[] iv = new byte[TAMANIO_IV]; 
+            System.arraycopy(archivoCifrado, 0, iv, 0, iv.length); 
+ 
+            byte[] datosCifradosBytes = new byte[archivoCifrado.length - TAMANIO_IV]; 
+            System.arraycopy(archivoCifrado, TAMANIO_IV, datosCifradosBytes, 0, datosCifradosBytes.length); 
+ 
+            Cipher cipher = Cipher.getInstance(TRANSFORMACION); 
+            GCMParameterSpec spec = new GCMParameterSpec(TAMANIO_TAG, iv); 
+            cipher.init(Cipher.DECRYPT_MODE, claveAES, spec); 
+ 
+            return cipher.doFinal(datosCifradosBytes); 
+        } catch (Exception e) { 
+            System.err.println("Error al descifrar archivo con AES: " + e.getMessage()); 
             return null; 
         } 
     } 
