@@ -1,0 +1,11 @@
+jre/
+javafx/
+out/
+.idea/
+
+*.class
+*.log
+config.xml
+
+Cifrador.exe
+CifradorApp.jar
