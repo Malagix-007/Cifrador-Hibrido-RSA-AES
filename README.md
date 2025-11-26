@@ -41,6 +41,8 @@ Si deseas clonar la rama `release` y compilar el código tú mismo, necesitarás
 2.  **JavaFX SDK:** Versión 21 (debes configurar la ruta en los scripts `.bat` o en tu IDE).
 3.  **MySQL Server:** Una instancia local o remota corriendo.
 O en su defecto ir al link de drive anexado en Sources, descomprimir y ejecutar el archivo "cifradorhibrido"
+
+Si solamente deseas acceder al proyecto como usuario final, puedes ir a la rama de Sources, donde podras tener accesso a la versión portable del proyecto, lista solo pra descomprimir y usar como un ejecutable 
 ### Configuración de la Base de Datos
 Para que la aplicación funcione, ejecuta este script SQL en tu gestor de base de datos:
 
