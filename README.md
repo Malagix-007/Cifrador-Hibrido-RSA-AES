@@ -5,7 +5,7 @@
 ![Database](https://img.shields.io/badge/Database-MySQL-cF3735)
 ![Security](https://img.shields.io/badge/Security-AES%2BRSA-green)
 
-Bienvenido al repositorio oficial del proyecto **Cifrador Híbrido**. Esta aplicación de escritorio permite cifrar y descifrar
+Bienvenidos a mi repositorio mi del proyecto **Cifrador Híbrido**. Esta aplicación de escritorio permite cifrar y descifrar
 cualquier tipo de archivo digital utilizando un esquema de criptografía híbrida (AES para los datos y RSA para proteger las llaves),
 asegurando un alto nivel de confidencialidad e integridad, con registro de auditoría en base de datos.
 
